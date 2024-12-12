@@ -1,0 +1,59 @@
+plugins {
+    id 'application'
+    id 'org.gradle.jacoco' // Plugin de JaCoCo
+}
+
+repositories {
+    mavenCentral() // Usamos Maven Central para las dependencias
+}
+
+dependencies {
+    implementation 'com.google.guava:guava:31.0.1-jre' // Dependencia de ejemplo
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3' // JUnit para pruebas
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17) // Aseguramos que Gradle use Java 17
+    }
+}
+
+application {
+    mainClass = 'org.example.App' // Cambia esto según tu clase principal
+}
+
+testing {
+    suites {
+        test {
+            useJUnitJupiter() // Configuramos JUnit Jupiter para pruebas
+        }
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.8" // Usa la última versión soportada
+}
+
+jacocoTestReport {
+    dependsOn testing.suites.test // Generar el informe después de las pruebas
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml') // Informe en HTML
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 1.00 // Requiere 100% de cobertura
+            }
+        }
+    }
+}
+
+// Aseguramos que el informe de JaCoCo se ejecute después de las pruebas
+tasks.test {
+    finalizedBy jacocoTestReport
+}
